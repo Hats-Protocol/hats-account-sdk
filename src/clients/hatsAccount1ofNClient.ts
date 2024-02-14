@@ -64,6 +64,14 @@ export class HatsAccount1ofNClient {
     this._chainId = walletClient.chain.id.toString();
   }
 
+  /**
+   * Deploy a new 1 of N Hats Account instance
+   *
+   * @param account A Viem account
+   * @param hatId ID of the hat for which to create the account
+   * @param salt arbitrary number as "salt"
+   * @returns An object containing the status of the call, the transaction hash and the new Hats Account instance
+   */
   async createAccount({
     account,
     hatId,
@@ -125,6 +133,14 @@ export class HatsAccount1ofNClient {
     }
   }
 
+  /**
+   * Perdict the address of a 1 of N Hats Account instance
+   *
+   * @param account A Viem account
+   * @param hatId ID of the hat for the account
+   * @param salt arbitrary number as "salt"
+   * @returns The predicted 1 of N Hats Account address
+   */
   async predictAccountAddress({
     hatId,
     salt,
