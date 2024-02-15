@@ -2,7 +2,7 @@ import type { Address } from "viem";
 
 export const HATS_ACCOUNT_1OFN_IMPLEMENTATION: { [chainID: string]: Address } =
   {
-    11155111: "0x5CB8a5B063B7E94cF39E8A8813A777f49B8DD050",
+    11155111: "0xfEf83A660b7C10a3EdaFdCF62DEee1fD8a875D29",
   };
 
 export const ERC6551_REGISTRY = "0x000000006551c19487814612e58FE06813775758";
