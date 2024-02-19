@@ -6,14 +6,16 @@ import {
   NoChainError,
   ChainNotSupportedError,
   getRegistryError,
+  getHatsAccount1OfNError,
 } from "../errors";
 import {
   HATS_ACCOUNT_1OFN_IMPLEMENTATION,
+  HATS_ACCOUNT_1OFN_ABI,
   ERC6551_REGISTRY,
   ERC6551_REGISTRY_ABI,
   HATS,
 } from "../constants";
-import type { CreateAccountResult } from "../types";
+import type { CreateAccountResult, ExecutionResult, Operation } from "../types";
 import type { Account, Address } from "viem";
 
 export class HatsAccount1ofNClient {
@@ -162,5 +164,100 @@ export class HatsAccount1ofNClient {
     });
 
     return account;
+  }
+
+  /**
+   * Execute an operation. Only wearers of the account's hat can execute.
+   *
+   * @param account A Viem account
+   * @param instance The Hats Account instance
+   * @param operation The operation to execute, includes:
+   * - to: The target address of the operation
+   * - value: The Ether value to be sent to the target
+   * - data: The encoded operation calldata
+   * - operation: A value indicating the type of operation to perform (call or delegatecall)
+   * @returns An object containing the status of the call and the transaction hash
+   */
+  async execute({
+    account,
+    instance,
+    operation,
+  }: {
+    account: Account | Address;
+    instance: Address;
+    operation: Operation;
+  }): Promise<ExecutionResult> {
+    try {
+      const { request } = await this._publicClient.simulateContract({
+        address: instance,
+        abi: HATS_ACCOUNT_1OFN_ABI,
+        functionName: "execute",
+        args: [
+          operation.to,
+          operation.value,
+          operation.data,
+          operation.operation,
+        ],
+        account,
+      });
+
+      const hash = await this._walletClient.writeContract(request);
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+      };
+    } catch (err) {
+      getHatsAccount1OfNError(err);
+    }
+  }
+
+  /**
+   * Execute a batch of operations. Only wearers of the account's hat can execute.
+   *
+   * @param account A Viem account
+   * @param instance The Hats Account instance
+   * @param operations The operations to execute, for each operation includes:
+   * - to: The target address of the operation
+   * - value: The Ether value to be sent to the target
+   * - data: The encoded operation calldata
+   * - operation: A value indicating the type of operation to perform (call or delegatecall)
+   * @returns An object containing the status of the call and the transaction hash
+   */
+  async executeBatch({
+    account,
+    instance,
+    operations,
+  }: {
+    account: Account | Address;
+    instance: Address;
+    operations: Operation[];
+  }): Promise<ExecutionResult> {
+    try {
+      const { request } = await this._publicClient.simulateContract({
+        address: instance,
+        abi: HATS_ACCOUNT_1OFN_ABI,
+        functionName: "executeBatch",
+        args: [operations],
+        account,
+      });
+
+      const hash = await this._walletClient.writeContract(request);
+
+      const receipt = await this._publicClient.waitForTransactionReceipt({
+        hash,
+      });
+
+      return {
+        status: receipt.status,
+        transactionHash: receipt.transactionHash,
+      };
+    } catch (err) {
+      getHatsAccount1OfNError(err);
+    }
   }
 }
