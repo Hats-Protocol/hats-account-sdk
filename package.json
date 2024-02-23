@@ -1,6 +1,6 @@
 {
   "name": "@hatsprotocol/hats-account-sdk",
-  "version": "0.0.3",
+  "version": "0.0.5",
   "author": "Haberdasher Labs",
   "main": "dist/hats-account-sdk.cjs.js",
   "module": "dist/hats-account-sdk.esm.js",
